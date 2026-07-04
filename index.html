@@ -131,7 +131,11 @@ async function loadYouTubeStats() {
     }
 }
 
+// Load immediately
 loadYouTubeStats();
+
+// Refresh every 10 seconds
+setInterval(loadYouTubeStats, 10000);
 </script>
     
     <footer>
