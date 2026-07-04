@@ -111,6 +111,38 @@
 </div>
 
 <script>
+function animateCount(element, start, end, duration = 800) {
+    const range = end - start;
+    const startTime = performance.now();
+
+    function update(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const value = Math.floor(start + range * progress);
+        element.textContent = value;
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    requestAnimationFrame(update);
+}
+
+function applyEffects(element, increased) {
+    // Reset animation classes
+    element.classList.remove("flash", "fade", "bounce");
+
+    // Force reflow so animations restart
+    void element.offsetWidth;
+
+    // Apply effects
+    if (increased) {
+        element.classList.add("flash");
+    }
+    element.classList.add("fade");
+    element.classList.add("bounce");
+}
+
 async function loadYouTubeStats() {
     const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
 
@@ -118,26 +150,71 @@ async function loadYouTubeStats() {
         const response = await fetch(url);
         const data = await response.json();
 
-        document.getElementById("subs").innerText =
-            "Subscribers: " + data.counters.api.subscriberCount;
+        const subsElement = document.getElementById("subs");
+        const viewsElement = document.getElementById("views");
 
-        document.getElementById("views").innerText =
-            "Total Views: " + data.counters.api.viewCount;
+        const newSubs = data.counters.api.subscriberCount;
+        const newViews = data.counters.api.viewCount;
+
+        const oldSubs = parseInt(subsElement.dataset.value || "0");
+        const oldViews = parseInt(viewsElement.dataset.value || "0");
+
+        subsElement.dataset.value = newSubs;
+        viewsElement.dataset.value = newViews;
+
+        subsElement.innerHTML = "Subscribers: <span id='subsNum'></span>";
+        viewsElement.innerHTML = "Total Views: <span id='viewsNum'></span>";
+
+        const subsNum = document.getElementById("subsNum");
+        const viewsNum = document.getElementById("viewsNum");
+
+        animateCount(subsNum, oldSubs, newSubs);
+        animateCount(viewsNum, oldViews, newViews);
+
+        applyEffects(subsNum, newSubs > oldSubs);
+        applyEffects(viewsNum, newViews > oldViews);
 
     } catch (error) {
-        document.getElementById("subs").innerText = "Could not load stats";
-        document.getElementById("views").innerText = "";
+        subsElement.innerText = "Could not load stats";
+        viewsElement.innerText = "";
         console.log(error);
     }
 }
 
-// Load immediately
 loadYouTubeStats();
-
-// Refresh every 10 seconds
 setInterval(loadYouTubeStats, 10000);
 </script>
-    
+
+<style>
+/* Fade-in effect */
+.fade {
+    animation: fadeIn 0.6s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0.3; }
+    to { opacity: 1; }
+}
+
+/* Color flash when numbers increase */
+.flash {
+    animation: flashColor 0.6s ease;
+}
+@keyframes flashColor {
+    0% { color: lime; }
+    100% { color: white; }
+}
+
+/* Bounce effect */
+.bounce {
+    animation: bounceAnim 0.4s ease;
+}
+@keyframes bounceAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+</style>
+
     <footer>
         <p id="copyright"></p>
     </footer>
