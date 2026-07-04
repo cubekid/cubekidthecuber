@@ -112,81 +112,81 @@
 	<div id="yt-stats">
     <p id="subs">Subscribers: Loading...</p>
     <p id="views">Total Views: Loading...</p>
-</div>
+	</div>
 
 <script>
-function animateCount(element, start, end, duration = 800) {
-    const range = end - start;
-    const startTime = performance.now();
+	function animateCount(element, start, end, duration = 800) {
+    	const range = end - start;
+    	const startTime = performance.now();
 
-    function update(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const value = Math.floor(start + range * progress);
-        element.textContent = value;
+    	function update(now) {
+        	const progress = Math.min((now - startTime) / duration, 1);
+        	const value = Math.floor(start + range * progress);
+        	element.textContent = value;
 
-        if (progress < 1) {
-            requestAnimationFrame(update);
-        }
-    }
+        	if (progress < 1) {
+            	requestAnimationFrame(update);
+        	}
+    	}
 
-    requestAnimationFrame(update);
-}
+    	requestAnimationFrame(update);
+	}
 
-function applyEffects(element, increased) {
-    // Reset animation classes
-    element.classList.remove("flash", "fade", "bounce");
+	function applyEffects(element, increased) {
+    	// Reset animation classes
+    	element.classList.remove("flash", "fade", "bounce");
 
-    // Force reflow so animations restart
-    void element.offsetWidth;
+    	// Force reflow so animations restart
+    	void element.offsetWidth;
 
-    // Apply effects
-    if (increased) {
-        element.classList.add("flash");
-    }
-    element.classList.add("fade");
-    element.classList.add("bounce");
-}
+    	// Apply effects
+    	if (increased) {
+        	element.classList.add("flash");
+    	}
+    	element.classList.add("fade");
+    	element.classList.add("bounce");
+	}
 
-async function loadYouTubeStats() {
-    const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
+	async function loadYouTubeStats() {
+    	const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+    	try {
+        	const response = await fetch(url);
+        	const data = await response.json();
 
-        const subsElement = document.getElementById("subs");
-        const viewsElement = document.getElementById("views");
+        	const subsElement = document.getElementById("subs");
+        	const viewsElement = document.getElementById("views");
+	
+        	const newSubs = data.counters.api.subscriberCount;
+        	const newViews = data.counters.api.viewCount;
 
-        const newSubs = data.counters.api.subscriberCount;
-        const newViews = data.counters.api.viewCount;
+        	const oldSubs = parseInt(subsElement.dataset.value || "0");
+        	const oldViews = parseInt(viewsElement.dataset.value || "0");
 
-        const oldSubs = parseInt(subsElement.dataset.value || "0");
-        const oldViews = parseInt(viewsElement.dataset.value || "0");
+        	subsElement.dataset.value = newSubs;
+        	viewsElement.dataset.value = newViews;
 
-        subsElement.dataset.value = newSubs;
-        viewsElement.dataset.value = newViews;
+        	subsElement.innerHTML = "Subscribers: <span id='subsNum'></span>";
+        	viewsElement.innerHTML = "Total Views: <span id='viewsNum'></span>";
 
-        subsElement.innerHTML = "Subscribers: <span id='subsNum'></span>";
-        viewsElement.innerHTML = "Total Views: <span id='viewsNum'></span>";
+        	const subsNum = document.getElementById("subsNum");
+        	const viewsNum = document.getElementById("viewsNum");
 
-        const subsNum = document.getElementById("subsNum");
-        const viewsNum = document.getElementById("viewsNum");
+        	animateCount(subsNum, oldSubs, newSubs);
+        	animateCount(viewsNum, oldViews, newViews);
 
-        animateCount(subsNum, oldSubs, newSubs);
-        animateCount(viewsNum, oldViews, newViews);
+        	applyEffects(subsNum, newSubs > oldSubs);
+        	applyEffects(viewsNum, newViews > oldViews);
 
-        applyEffects(subsNum, newSubs > oldSubs);
-        applyEffects(viewsNum, newViews > oldViews);
+    	} catch (error) {
+        	subsElement.innerText = "Could not load stats";
+        	viewsElement.innerText = "";
+        	console.log(error);
+    	}
+	}
 
-    } catch (error) {
-        subsElement.innerText = "Could not load stats";
-        viewsElement.innerText = "";
-        console.log(error);
-    }
-}
-
-loadYouTubeStats();
-setInterval(loadYouTubeStats, 10000);
+	loadYouTubeStats();
+	setInterval(loadYouTubeStats, 10000);
 </script>
 
 <style>
