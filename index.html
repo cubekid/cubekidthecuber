@@ -104,6 +104,36 @@
 
     <h1 class="title">Cube Kid</h1>
     <h2 class="title">The cuber</h2>
+
+	<div id="yt-stats">
+    <p id="subs">Subscribers: Loading...</p>
+    <p id="views">Total Views: Loading...</p>
+</div>
+
+<script>
+async function loadYouTubeStats() {
+    const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        document.getElementById("subs").innerText =
+            "Subscribers: " + data.subscriberCount;
+
+        document.getElementById("views").innerText =
+            "Total Views: " + data.viewCount;
+
+    } catch (error) {
+        document.getElementById("subs").innerText = "Could not load stats";
+        document.getElementById("views").innerText = "";
+        console.log(error);
+    }
+}
+
+loadYouTubeStats();
+</script>
+
     
     <footer>
         <p id="copyright"></p>
