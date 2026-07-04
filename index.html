@@ -119,10 +119,10 @@ async function loadYouTubeStats() {
         const data = await response.json();
 
         document.getElementById("subs").innerText =
-            "Subscribers: " + data.data.subscriberCount;
+            "Subscribers: " + data.counters.api.subscriberCount;
 
         document.getElementById("views").innerText =
-            "Total Views: " + data.data.viewCount;
+            "Total Views: " + data.counters.api.viewCount;
 
     } catch (error) {
         document.getElementById("subs").innerText = "Could not load stats";
