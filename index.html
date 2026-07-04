@@ -74,13 +74,26 @@
             color: blue;
             margin-left: 15px;
         }
+        
+        #yt-stats {
+    		background-color: black;
+    		border-radius: 10px;
+    		padding: 9px;
+    		margin-left: 0px;
+    		display: inline-block;
+		}
+
 
 		#yt-stats p {
 			font-weight: 700;
 			font-size: 24px;
 			color: red;
-			margin-left: 25px;
+			margin: 0px;
 		}
+        
+        #center-box {
+        	text-align: center;
+        }
         
         /* Footer */
         footer {
@@ -112,10 +125,12 @@
     <h1 class="title">Cube Kid</h1>
     <h2 class="title">The cuber</h2>
 
+	<div id="center-box">
 	<div id="yt-stats">
-    <p id="subs">Subscribers: Loading...</p>
-    <p id="views">Total Views: Loading...</p>
+    	<p id="subs">Subscribers: Loading...</p>
+    	<p id="views">Total Views: Loading...</p>
 	</div>
+    </div>
 
 <script>
 	function animateCount(element, start, end, duration = 800) {
