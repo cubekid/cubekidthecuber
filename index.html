@@ -126,7 +126,7 @@
     		padding: 11px;
     		margin:0;
 			margin-top: 8px;
-			margin-bottom 8px;
+			margin-bottom: 8px;
     		display: inline-block;
 			box-shadow:
 			0 0 12px #ff2b2b,
@@ -184,79 +184,86 @@
     </div>
 
 <script>
-	function animateCount(element, start, end, duration = 800) {
-    	const range = end - start;
-    	const startTime = performance.now();
+    function animateCount(element, start, end, duration = 800) {
+        const range = end - start;
+        const startTime = performance.now();
 
-    	function update(now) {
-        	const progress = Math.min((now - startTime) / duration, 1);
-        	const value = Math.floor(start + range * progress);
-        	element.textContent = value;
+        function update(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const value = Math.floor(start + range * progress);
+            element.textContent = value;
 
-        	if (progress < 1) {
-            	requestAnimationFrame(update);
-        	}
-    	}
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
 
-    	requestAnimationFrame(update);
-	}
+        requestAnimationFrame(update);
+    }
 
-	function applyEffects(element, increased) {
-    	// Reset animation classes
-    	element.classList.remove("flash", "fade", "bounce");
+    function applyEffects(element, increased) {
+        element.classList.remove("flash", "fade", "bounce");
+        void element.offsetWidth;
+        if (increased) element.classList.add("flash");
+        element.classList.add("fade");
+        element.classList.add("bounce");
+    }
 
-    	// Force reflow so animations restart
-    	void element.offsetWidth;
+    async function loadYouTubeStats() {
+        const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
 
-    	// Apply effects
-    	if (increased) {
-        	element.classList.add("flash");
-    	}
-    	element.classList.add("fade");
-    	element.classList.add("bounce");
-	}
+        const subsElement = document.getElementById("subs");
+        const viewsElement = document.getElementById("views");
 
-	async function loadYouTubeStats() {
-    	const url = "https://api.socialcounts.org/youtube-live-subscriber-count/UCse5iYk7m7iH4FeFQJQzqEw";
+        // Load previous values or default to 0
+        let oldSubs = parseInt(subsElement.dataset.value || "0");
+        let oldViews = parseInt(viewsElement.dataset.value || "0");
 
-    	try {
-        	const response = await fetch(url);
-        	const data = await response.json();
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
 
-        	const subsElement = document.getElementById("subs");
-        	const viewsElement = document.getElementById("views");
-	
-        	const newSubs = data.counters.api.subscriberCount;
-        	const newViews = data.counters.api.viewCount;
+            // Validate data before using it
+            const newSubs = Number(data?.counters?.api?.subscriberCount);
+            const newViews = Number(data?.counters?.api?.viewCount);
 
-        	const oldSubs = parseInt(subsElement.dataset.value || "0");
-        	const oldViews = parseInt(viewsElement.dataset.value || "0");
+            if (!Number.isFinite(newSubs) || !Number.isFinite(newViews)) {
+                console.warn("Invalid API data, keeping old values.");
+                return; // Keep last known values
+            }
 
-        	subsElement.dataset.value = newSubs;
-        	viewsElement.dataset.value = newViews;
+            // Store new values
+            subsElement.dataset.value = newSubs;
+            viewsElement.dataset.value = newViews;
 
-        	subsElement.innerHTML = "Subscribers: <span id='subsNum'></span>";
-        	viewsElement.innerHTML = "Total Views: <span id='viewsNum'></span>";
+            // Rebuild inner HTML
+            subsElement.innerHTML = "Subscribers: <span id='subsNum'></span>";
+            viewsElement.innerHTML = "Total Views: <span id='viewsNum'></span>";
 
-        	const subsNum = document.getElementById("subsNum");
-        	const viewsNum = document.getElementById("viewsNum");
+            const subsNum = document.getElementById("subsNum");
+            const viewsNum = document.getElementById("viewsNum");
 
-        	animateCount(subsNum, oldSubs, newSubs);
-        	animateCount(viewsNum, oldViews, newViews);
+            // Animate from old → new
+            animateCount(subsNum, oldSubs, newSubs);
+            animateCount(viewsNum, oldViews, newViews);
 
-        	applyEffects(subsNum, newSubs > oldSubs);
-        	applyEffects(viewsNum, newViews > oldViews);
+            // Apply effects
+            applyEffects(subsNum, newSubs > oldSubs);
+            applyEffects(viewsNum, newViews > oldViews);
 
-    	} catch (error) {
-        	subsElement.innerText = "Could not load stats";
-        	viewsElement.innerText = "";
-        	console.log(error);
-    	}
-	}
+        } catch (error) {
+            console.warn("API failed, keeping last known values.", error);
 
-	loadYouTubeStats();
-	setInterval(loadYouTubeStats, 10000);
+            // Rebuild inner HTML using stored values
+            subsElement.innerHTML = `Subscribers: <span id='subsNum'>${oldSubs}</span>`;
+            viewsElement.innerHTML = `Total Views: <span id='viewsNum'>${oldViews}</span>`;
+        }
+    }
+
+    loadYouTubeStats();
+    setInterval(loadYouTubeStats, 10000);
 </script>
+
 
 <style>
 /* Fade-in effect */
