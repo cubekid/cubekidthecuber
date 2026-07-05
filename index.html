@@ -74,6 +74,46 @@
         h2.title {
             margin-top: 0;
         }
+        
+        h1.title {
+    		animation-name: glideIn, text;
+    		animation-duration: 2s, 9s;
+    		animation-iteration-count: 1, infinite;
+    		animation-delay: 0s, 2s;
+		}
+        
+        h2.title {
+           	animation-name: glideInSmall, text;
+    		animation-duration: 2s, 9s;
+    		animation-iteration-count: 1, infinite;
+    		animation-delay: 0s, 2s;
+        }
+
+		@keyframes glideIn {
+  			0% {transform: translate(-500px, 0px);}
+            80% {transform: translate(25px, 0px);}
+            90% { color: cyan; }
+  			100% { 
+            	transform: translate(0px, 0px);
+            	color: blue;
+            }
+		}
+        
+        @keyframes glideInSmall {
+  			0% {transform: translate(-500px, 0px);}
+            80% {transform: translate(25px, 0px);}
+  			100% {transform: translate(0px, 0px);}
+		}
+        
+        @keyframes text {
+  			0% { color: blue; }
+  			16.67% { color: red; }
+  			33.34% { color: orange; }
+  			50.01% { color: yellow; }
+  			66.68% { color: white; }
+  			83.35% { color: limegreen; }
+  			100% { color: blue; }
+		}
 
         body p {
             color: blue;
